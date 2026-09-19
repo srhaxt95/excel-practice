@@ -3,102 +3,191 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบฝึกทำโจทย์สูตร Excel (Excel Practice Lab)</title>
+  <title>Excel Tutor & Practice Lab</title>
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #f4f6f9; color: #333; margin: 0; padding: 20px; }
-    .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-    h1 { text-align: center; color: #107c41; margin-bottom: 25px; }
-    .tabs { display: flex; gap: 10px; border-bottom: 2px solid #e0e0e0; margin-bottom: 20px; }
-    .tab-btn { padding: 12px 20px; border: none; background: none; font-size: 16px; font-weight: 600; cursor: pointer; color: #666; border-bottom: 3px solid transparent; }
+    body { background-color: #f0f2f5; color: #2d3748; margin: 0; padding: 20px; }
+    .container { max-width: 950px; margin: 0 auto; background: #fff; padding: 32px; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    h1 { text-align: center; color: #107c41; margin-top: 0; font-size: 26px; }
+    
+    .tabs { display: flex; gap: 8px; border-bottom: 2px solid #e2e8f0; margin-bottom: 24px; overflow-x: auto; }
+    .tab-btn { padding: 12px 20px; border: none; background: none; font-size: 15px; font-weight: 600; cursor: pointer; color: #718096; border-bottom: 3px solid transparent; white-space: nowrap; }
     .tab-btn.active { color: #107c41; border-bottom: 3px solid #107c41; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
+
+    /* Lesson Section */
+    .lesson-card { background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 22px; margin-bottom: 22px; }
+    .lesson-card h3 { margin-top: 0; color: #2c5282; font-size: 17px; display: flex; align-items: center; gap: 8px; }
+    .syntax-box { background: #edf2f7; padding: 10px 14px; border-radius: 6px; font-family: monospace; font-size: 14px; color: #2d3748; margin: 10px 0; border-left: 3px solid #3182ce; }
     
-    .question-box { background: #f8fafc; border-left: 4px solid #107c41; padding: 15px; margin-bottom: 20px; border-radius: 4px; }
-    .preview-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    .preview-table th, .preview-table td { border: 1px solid #dcdfe6; padding: 8px 12px; text-align: left; font-size: 14px; }
-    .preview-table th { background: #f0f3f6; font-weight: 600; }
+    /* Quiz Section */
+    .quiz-card { background: #ffffff; border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; }
+    .badge { display: inline-block; background: #e2e8f0; color: #4a5568; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+    .preview-table { width: 100%; border-collapse: collapse; margin: 14px 0 20px; font-size: 14px; }
+    .preview-table th, .preview-table td { border: 1px solid #cbd5e0; padding: 10px 12px; text-align: left; }
+    .preview-table th { background: #edf2f7; font-weight: 600; }
+    .target-cell { background: #fffaf0; border: 2px dashed #dd6b20 !important; font-weight: bold; color: #c05621; }
+
+    .input-group { margin-bottom: 16px; }
+    .input-group label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+    input[type="text"] { width: 100%; padding: 12px 14px; font-family: Consolas, Monaco, monospace; font-size: 15px; border: 1px solid #cbd5e0; border-radius: 6px; }
+    input[type="text"]:focus { outline: none; border-color: #107c41; box-shadow: 0 0 0 3px rgba(16,124,65,0.15); }
     
-    .input-group { margin-bottom: 20px; }
-    label { display: block; font-weight: bold; margin-bottom: 8px; }
-    input[type="text"] { width: 100%; padding: 12px; font-family: monospace; font-size: 15px; border: 1px solid #ccd0d5; border-radius: 6px; }
-    input[type="text"]:focus { outline: none; border-color: #107c41; box-shadow: 0 0 0 2px rgba(16,124,65,0.2); }
+    .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    button { padding: 10px 20px; font-size: 14px; font-weight: 600; border-radius: 6px; cursor: pointer; border: none; transition: 0.15s ease; }
+    .btn-submit { background: #107c41; color: #fff; }
+    .btn-submit:hover { background: #0c6133; }
+    .btn-random { background: #edf2f7; color: #4a5568; border: 1px solid #cbd5e0; }
+    .btn-random:hover { background: #e2e8f0; }
+    .btn-hint { background: transparent; color: #718096; text-decoration: underline; padding: 10px 12px; }
     
-    button.check-btn { background: #107c41; color: #fff; border: none; padding: 10px 24px; font-size: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; }
-    button.check-btn:hover { background: #0c6133; }
-    
-    .result { margin-top: 15px; padding: 12px; border-radius: 6px; font-size: 15px; display: none; }
-    .result.correct { background: #e6f7ec; color: #0d6835; border: 1px solid #a3e0b8; }
-    .result.wrong { background: #fde8e8; color: #9b1c1c; border: 1px solid #f8b4b4; }
-    .explanation { margin-top: 10px; font-size: 14px; color: #555; display: none; line-height: 1.5; }
+    .feedback { margin-top: 18px; padding: 14px 18px; border-radius: 6px; font-size: 14px; display: none; line-height: 1.6; }
+    .feedback.correct { background: #f0fff4; color: #22543d; border: 1px solid #9ae6b4; }
+    .feedback.wrong { background: #fff5f5; color: #742a2a; border: 1px solid #feb2b2; }
+    .feedback.hint { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>📊 ห้องเรียนฝึกพิมพ์สูตร Excel</h1>
+  <h1>🎓 Excel Formula Mastery Lab</h1>
 
-  <!-- Navigation Tabs -->
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab(0)">1. Emails (ตัดข้อความ)</button>
-    <button class="tab-btn" onclick="switchTab(1)">2. Bonus (คำนวณโบนัส)</button>
-    <button class="tab-btn" onclick="switchTab(2)">3. Grade & Remark (ตัดเกรด)</button>
+    <button class="tab-btn active" onclick="switchTab(0)">1. Text Manipulation (แยกอีเมล)</button>
+    <button class="tab-btn" onclick="switchTab(1)">2. Bonus Calculator (คิดโบนัส)</button>
+    <button class="tab-btn" onclick="switchTab(2)">3. Grade & Regrade (ตัดเกรด)</button>
   </div>
 
-  <!-- Tab 1: Emails -->
+  <!-- TAB 1: EMAILS -->
   <div class="tab-content active" id="tab-0">
-    <div class="question-box">
-      <strong>โจทย์:</strong> ตัดข้อความจากอีเมล <code>mio.aki@yahoo.com</code> (เซลล์ A2) เพื่อดึง <strong>Lastname (aki)</strong> ลงในเซลล์ C2
+    <div class="lesson-card">
+      <h3>📖 บทเรียน: การแยกข้อความด้วย LEFT, MID, FIND</h3>
+      <p>โครงสร้างอีเมล: <code>name.lastname@provider.com</code></p>
+      <ul>
+        <li><strong>หาจุดอ้างอิง:</strong> ใช้ <code>FIND(".", เซลล์)</code> เพื่อหาตำแหน่งจุด และ <code>FIND("@", เซลล์)</code> หาตำแหน่ง @</li>
+        <li><strong>ตัดข้อความ:</strong>
+          <div class="syntax-box">=LEFT(A2, FIND(".", A2) - 1)  → ดึงชื่อหน้าจุด</div>
+          <div class="syntax-box">=MID(A2, FIND(".", A2) + 1, FIND("@", A2) - FIND(".", A2) - 1) → ดึงนามสกุลระหว่างจุดกับ @</div>
+          <div class="syntax-box">=MID(A2, FIND("@", A2) + 1, LEN(A2)) → ดึง Provider ด้านหลัง @ ทั้งหมด</div>
+        </li>
+      </ul>
     </div>
-    <table class="preview-table">
-      <tr><th>A (email)</th><th>B (name)</th><th>C (lastname)</th><th>D (email provider)</th></tr>
-      <tr><td>mio.aki@yahoo.com</td><td>mio</td><td style="background:#fff3cd;">[พิมพ์สูตรตรงนี้]</td><td>yahoo.com</td></tr>
-    </table>
-    <div class="input-group">
-      <label>ใส่สูตร Excel สำหรับเซลล์ C2:</label>
-      <input type="text" id="ans-1" placeholder="พิมพ์สูตรเริ่มต้นด้วย = เช่น =MID(...)">
+
+    <div class="quiz-card">
+      <span class="badge">แบบฝึกหัดสุ่มโจทย์</span>
+      <p><strong>โจทย์:</strong> จงเขียนสูตรในช่อง <span id="t1-target-col">C2 (lastname)</span> สำหรับข้อมูลอีเมลด้านล่างนี้</p>
+      
+      <table class="preview-table">
+        <tr><th>A (email)</th><th>B (name)</th><th>C (lastname)</th><th>D (email provider)</th></tr>
+        <tr>
+          <td id="t1-val-email">mio.aki@yahoo.com</td>
+          <td id="t1-cell-b">mio</td>
+          <td id="t1-cell-c" class="target-cell">[ ใส่สูตรที่นี่ ]</td>
+          <td id="t1-cell-d">yahoo.com</td>
+        </tr>
+      </table>
+
+      <div class="input-group">
+        <label>พิมพ์สูตร Excel (เริ่มด้วย = ):</label>
+        <input type="text" id="ans-1" placeholder="พิมพ์สูตรที่นี่...">
+      </div>
+
+      <div class="actions">
+        <button class="btn-submit" onclick="checkAnswer(1)">ตรวจคำตอบ</button>
+        <button class="btn-random" onclick="initTab1()">🎲 สุ่มโจทย์ใหม่</button>
+        <button class="btn-hint" onclick="showHint(1)">ดูเฉลย</button>
+      </div>
+
+      <div id="res-1" class="feedback"></div>
     </div>
-    <button class="check-btn" onclick="checkAnswer(1)">ตรวจคำตอบ</button>
-    <div id="res-1" class="result"></div>
-    <div id="exp-1" class="explanation"></div>
   </div>
 
-  <!-- Tab 2: Bonus -->
+  <!-- TAB 2: BONUS -->
   <div class="tab-content" id="tab-1">
-    <div class="question-box">
-      <strong>โจทย์:</strong> คำนวณโบนัสเป็นเงินบาทลงในเซลล์ C6 โดยดูเงื่อนไขวันลาจาก B6 และเงินเดือนจาก D6<br>
-      (เงื่อนไข: &le;5 วัน ได้ช่อง $E$2 [10%], 6-10 วัน ได้ช่อง $E$3 [7.50%], &gt;10 วัน ได้ช่อง $E$4 [3%])
+    <div class="lesson-card">
+      <h3>📖 บทเรียน: IF ซ้อน IF และการล็อกเซลล์ ($)</h3>
+      <p>เมื่อต้องตรวจสอบเงื่อนไขหลายระดับ ให้เขียนไล่ลำดับอย่างเป็นระเบียบ:</p>
+      <div class="syntax-box">=IF(วันลา &lt;= 5, เงินเดือน * $E$2, IF(วันลา &lt;= 10, เงินเดือน * $E$3, เงินเดือน * $E$4))</div>
+      <p>💡 <strong>ทริกสำคัญ:</strong> ต้องใส่เครื่องหมาย <code>$</code> ล็อกแถวของช่องเปอร์เซ็นต์ (เช่น <code>$E$2</code>) เพื่อไม่ให้ตำแหน่งเลื่อนเมื่อลากสูตร</p>
     </div>
-    <table class="preview-table">
-      <tr><th>B (จำนวนวันลา)</th><th>C (bonus)</th><th>D (เงินเดือน)</th></tr>
-      <tr><td>5</td><td style="background:#fff3cd;">[พิมพ์สูตรตรงนี้]</td><td>20000</td></tr>
-    </table>
-    <div class="input-group">
-      <label>ใส่สูตร Excel สำหรับเซลล์ C6:</label>
-      <input type="text" id="ans-2" placeholder="=IF($B6<=5, ...)">
+
+    <div class="quiz-card">
+      <span class="badge">แบบฝึกหัดสุ่มโจทย์</span>
+      <p><strong>โจทย์:</strong> จงเขียนสูตรคำนวณเงินโบนัส (บาท) ในเซลล์ <strong>C6</strong> ตามข้อมูลพนักงานที่สุ่มได้</p>
+      
+      <table class="preview-table" style="max-width: 400px; margin-bottom: 12px;">
+        <tr><th colspan="2">ตารางเกณฑ์โบนัสอ้างอิง</th></tr>
+        <tr><td>&lt;= 5 วัน ($E$2)</td><td>10% ของเงินเดือน</td></tr>
+        <tr><td>6-10 วัน ($E$3)</td><td>7.50% ของเงินเดือน</td></tr>
+        <tr><td>&gt; 10 วัน ($E$4)</td><td>3% ของเงินเดือน</td></tr>
+      </table>
+
+      <table class="preview-table">
+        <tr><th>A (ชื่อ)</th><th>B (วันลา)</th><th>C (bonus)</th><th>D (เงินเดือน)</th></tr>
+        <tr>
+          <td id="t2-name">john</td>
+          <td id="t2-days" style="font-weight: bold; color: #2b6cb0;">5</td>
+          <td class="target-cell">[ ใส่สูตรที่นี่ ]</td>
+          <td id="t2-salary">20000</td>
+        </tr>
+      </table>
+
+      <div class="input-group">
+        <label>พิมพ์สูตร Excel สำหรับเซลล์ C6:</label>
+        <input type="text" id="ans-2" placeholder="=IF($B6<=5, ...)">
+      </div>
+
+      <div class="actions">
+        <button class="btn-submit" onclick="checkAnswer(2)">ตรวจคำตอบ</button>
+        <button class="btn-random" onclick="initTab2()">🎲 สุ่มโจทย์ใหม่</button>
+        <button class="btn-hint" onclick="showHint(2)">ดูเฉลย</button>
+      </div>
+
+      <div id="res-2" class="feedback"></div>
     </div>
-    <button class="check-btn" onclick="checkAnswer(2)">ตรวจคำตอบ</button>
-    <div id="res-2" class="result"></div>
-    <div id="exp-2" class="explanation"></div>
   </div>
 
-  <!-- Tab 3: Grade -->
+  <!-- TAB 3: GRADE -->
   <div class="tab-content" id="tab-2">
-    <div class="question-box">
-      <strong>โจทย์:</strong> ใส่สูตรในช่อง Remark (C8) ถ้าเกรดใน B8 ต่ำกว่า C (ได้ "D" หรือ "F") ให้แสดง <strong>"Regrade"</strong> นอกนั้นให้เว้นว่าง <code>""</code>
+    <div class="lesson-card">
+      <h3>📖 บทเรียน: การตัดเกรดหลายชั้น & ฟังก์ชัน OR</h3>
+      <ul>
+        <li><strong>การตัดเกรด (GRADE):</strong> ใช้ IF ซ้อนกันโดยไล่จากคะแนนสูงไปต่ำ
+          <div class="syntax-box">=IF(A8&gt;=70, "A", IF(A8&gt;=61, "B", IF(A8&gt;=51, "C", IF(A8&gt;=41, "D", "F"))))</div>
+        </li>
+        <li><strong>การแจ้งเตือน (REMARK):</strong> ถ้าเกรดเป็น D หรือ F ให้ขึ้น "Regrade"
+          <div class="syntax-box">=IF(OR(B8="D", B8="F"), "Regrade", "")</div>
+        </li>
+      </ul>
     </div>
-    <table class="preview-table">
-      <tr><th>A (คะแนน)</th><th>B (GRADE)</th><th>C (REMARK)</th></tr>
-      <tr><td>85</td><td>A</td><td style="background:#fff3cd;">[พิมพ์สูตรตรงนี้]</td></tr>
-    </table>
-    <div class="input-group">
-      <label>ใส่สูตร Excel สำหรับเซลล์ C8:</label>
-      <input type="text" id="ans-3" placeholder="=IF(...)">
+
+    <div class="quiz-card">
+      <span class="badge">แบบฝึกหัดสุ่มโจทย์</span>
+      <p id="t3-desc"><strong>โจทย์:</strong> คะแนนดิบในช่อง <strong>A8 = <span id="t3-score" style="color:#d9534f; font-weight:bold;">85</span></strong></p>
+
+      <table class="preview-table">
+        <tr><th>A (คะแนน)</th><th>B (GRADE)</th><th>C (REMARK)</th></tr>
+        <tr>
+          <td id="t3-score-cell">85</td>
+          <td id="t3-grade-cell" class="target-cell">[ พิมพ์สูตรตัดเกรด ]</td>
+          <td id="t3-remark-cell">เว้นว่างไว้ก่อน</td>
+        </tr>
+      </table>
+
+      <div class="input-group">
+        <label id="t3-label">พิมพ์สูตรคำนวณเกรดในช่อง B8:</label>
+        <input type="text" id="ans-3" placeholder="=IF(A8>=70, ...)">
+      </div>
+
+      <div class="actions">
+        <button class="btn-submit" onclick="checkAnswer(3)">ตรวจคำตอบ</button>
+        <button class="btn-random" onclick="initTab3()">🎲 สุ่มโจทย์ใหม่</button>
+        <button class="btn-hint" onclick="showHint(3)">ดูเฉลย</button>
+      </div>
+
+      <div id="res-3" class="feedback"></div>
     </div>
-    <button class="check-btn" onclick="checkAnswer(3)">ตรวจคำตอบ</button>
-    <div id="res-3" class="result"></div>
-    <div id="exp-3" class="explanation"></div>
   </div>
 </div>
 
@@ -109,57 +198,163 @@
   }
 
   function clean(str) {
-    return str.replace(/\s+/g, '').toUpperCase();
+    return (str || '').replace(/\s+/g, '').toUpperCase();
   }
 
-  function checkAnswer(questionNum) {
-    const input = document.getElementById(`ans-${questionNum}`).value;
-    const resBox = document.getElementById(`res-${questionNum}`);
-    const expBox = document.getElementById(`exp-${questionNum}`);
-    const cleaned = clean(input);
-    
-    let isCorrect = false;
-    let explanation = '';
+  // DATA POOLS FOR RANDOMIZATION
+  const firstNames = ['somchai', 'sarah', 'alex', 'kenji', 'lisa', 'naruto', 'tanaka', 'david'];
+  const lastNames = ['smith', 'miller', 'wong', 'sato', 'kim', 'cooper', 'rossi', 'patel'];
+  const domains = ['gmail.com', 'hotmail.com', 'yahoo.com', 'outlook.com', 'ku.th'];
+  const employees = ['john', 'somrak', 'wichai', 'ananda', 'ploy', 'nattha', 'karn'];
 
-    if (questionNum === 1) {
-      // ตรวจ Worksheet 1 (Lastname)
-      if (cleaned === clean('=MID(A2,FIND(".",A2)+1,FIND("@",A2)-FIND(".",A2)-1)') ||
-          cleaned === clean('=TEXTBETWEEN(A2,".","@")')) {
-        isCorrect = true;
-      }
-      explanation = '<strong>เฉลย:</strong> <code>=MID(A2, FIND(".", A2)+1, FIND("@", A2)-FIND(".", A2)-1)</code><br>ใช้ FIND หาตำแหน่งจุดแล้วบวก 1 เพื่อเริ่มดึงข้อความ และหาความยาวด้วยตำแหน่ง @ ลบตำแหน่งจุด';
-    } 
-    else if (questionNum === 2) {
-      // ตรวจ Worksheet 2 (Bonus)
-      if (cleaned === clean('=IF($B6<=5,$D6*$E$2,IF($B6<=10,$D6*$E$3,$D6*$E$4))') ||
-          cleaned === clean('=IF(B6<=5,D6*$E$2,IF(B6<=10,D6*$E$3,D6*$E$4))') ||
-          cleaned === clean('=IF(B6>10,D6*$E$4,IF(B6>=6,D6*$E$3,D6*$E$2))')) {
-        isCorrect = true;
-      }
-      explanation = '<strong>เฉลย:</strong> <code>=IF($B6<=5,$D6*$E$2, IF($B6<=10,$D6*$E$3, $D6*$E$4))</code><br>อย่าลืมใส่ $ ล็อกเซลล์ $E$2, $E$3, $E$4 เพื่อไม่ให้เพี้ยนเวลาลากสูตร';
-    } 
-    else if (questionNum === 3) {
-      // ตรวจ Worksheet 3 (Remark)
-      if (cleaned === clean('=IF(OR(B8="D",B8="F"),"Regrade","")') ||
-          cleaned === clean('=IF(OR(B8="F",B8="D"),"Regrade","")') ||
-          cleaned === clean('=IF(A8<51,"Regrade","")')) {
-        isCorrect = true;
-      }
-      explanation = '<strong>เฉลย:</strong> <code>=IF(OR(B8="D", B8="F"), "Regrade", "")</code><br>ใช้ฟังก์ชัน OR ตรวจสอบว่าเกรดตรงกับ D หรือ F หรือไม่';
-    }
+  let q1Type = 'lastname'; // name, lastname, provider
+  let currentQ1 = {};
+  let currentQ2 = {};
+  let currentQ3 = {};
 
-    resBox.style.display = 'block';
-    expBox.style.display = 'block';
+  // TAB 1 GENERATOR
+  function initTab1() {
+    const fn = firstNames[Math.floor(Math.random()*firstNames.length)];
+    const ln = lastNames[Math.floor(Math.random()*lastNames.length)];
+    const dm = domains[Math.floor(Math.random()*domains.length)];
+    currentQ1 = { fn, ln, dm, email: `${fn}.${ln}@${dm}` };
 
-    if (isCorrect) {
-      resBox.className = 'result correct';
-      resBox.innerHTML = '🎉 ถูกต้องยอดเยี่ยม! สูตรทำงานได้สมบูรณ์';
+    const types = ['name', 'lastname', 'provider'];
+    q1Type = types[Math.floor(Math.random()*types.length)];
+
+    document.getElementById('t1-val-email').innerText = currentQ1.email;
+    document.getElementById('ans-1').value = '';
+    document.getElementById('res-1').style.display = 'none';
+
+    const b = document.getElementById('t1-cell-b');
+    const c = document.getElementById('t1-cell-c');
+    const d = document.getElementById('t1-cell-d');
+
+    b.className = ''; c.className = ''; d.className = '';
+    b.innerText = fn; c.innerText = ln; d.innerText = dm;
+
+    if (q1Type === 'name') {
+      document.getElementById('t1-target-col').innerText = 'B2 (name)';
+      b.className = 'target-cell';
+      b.innerText = '[ พิมพ์สูตร Name ]';
+    } else if (q1Type === 'lastname') {
+      document.getElementById('t1-target-col').innerText = 'C2 (lastname)';
+      c.className = 'target-cell';
+      c.innerText = '[ พิมพ์สูตร Lastname ]';
     } else {
-      resBox.className = 'result wrong';
-      resBox.innerHTML = '❌ สูตรยังไม่ถูกต้อง ลองตรวจเช็คชื่อฟังก์ชัน วงเล็บ หรือตำแหน่งเซลล์อีกครั้ง';
+      document.getElementById('t1-target-col').innerText = 'D2 (email provider)';
+      d.className = 'target-cell';
+      d.innerText = '[ พิมพ์สูตร Provider ]';
     }
-    expBox.innerHTML = explanation;
   }
+
+  // TAB 2 GENERATOR
+  function initTab2() {
+    const emp = employees[Math.floor(Math.random()*employees.length)];
+    const days = Math.floor(Math.random() * 20) + 1; // 1 to 20
+    const salaries = [20000, 25000, 30000, 35000, 40000, 50000];
+    const salary = salaries[Math.floor(Math.random()*salaries.length)];
+
+    currentQ2 = { emp, days, salary };
+    document.getElementById('t2-name').innerText = emp;
+    document.getElementById('t2-days').innerText = days;
+    document.getElementById('t2-salary').innerText = salary.toLocaleString();
+    document.getElementById('ans-2').value = '';
+    document.getElementById('res-2').style.display = 'none';
+  }
+
+  // TAB 3 GENERATOR
+  function initTab3() {
+    const score = Math.floor(Math.random() * 65) + 35; // 35 to 100
+    const mode = Math.random() > 0.5 ? 'GRADE' : 'REMARK';
+    currentQ3 = { score, mode };
+
+    document.getElementById('t3-score').innerText = score;
+    document.getElementById('t3-score-cell').innerText = score;
+    document.getElementById('ans-3').value = '';
+    document.getElementById('res-3').style.display = 'none';
+
+    const b = document.getElementById('t3-grade-cell');
+    const c = document.getElementById('t3-remark-cell');
+    b.className = ''; c.className = '';
+
+    if (mode === 'GRADE') {
+      document.getElementById('t3-desc').innerHTML = `<strong>โจทย์:</strong> จงใส่สูตรคำนวณ <strong>GRADE</strong> ในช่อง <strong>B8</strong> สำหรับคะแนนดิบ <strong>A8 = ${score}</strong>`;
+      document.getElementById('t3-label').innerText = 'พิมพ์สูตรคำนวณเกรดในช่อง B8:';
+      b.className = 'target-cell';
+      b.innerText = '[ ใส่สูตรตัดเกรด ]';
+      c.innerText = '-';
+    } else {
+      let g = 'F';
+      if(score >= 70) g = 'A'; else if(score >= 61) g = 'B'; else if(score >= 51) g = 'C'; else if(score >= 41) g = 'D';
+      document.getElementById('t3-desc').innerHTML = `<strong>โจทย์:</strong> ถ้าเกรดใน <strong>B8 = "${g}"</strong> จงเขียนสูตรในช่อง <strong>C8 (REMARK)</strong> (ถ้าเกรดต่ำกว่า C ให้แสดง "Regrade" นอกนั้นเว้นว่าง)`;
+      document.getElementById('t3-label').innerText = 'พิมพ์สูตรแสดง Remark ในช่อง C8:';
+      b.innerText = g;
+      c.className = 'target-cell';
+      c.innerText = '[ ใส่สูตร Remark ]';
+    }
+  }
+
+  // EVALUATOR
+  function checkAnswer(q) {
+    const res = document.getElementById(`res-${q}`);
+    const input = document.getElementById(`ans-${q}`).value;
+    const cVal = clean(input);
+    let pass = false;
+    let feedbackText = '';
+
+    if (q === 1) {
+      if (q1Type === 'name' && (cVal.includes('LEFT(A2,FIND(".",A2)-1)') || cVal.includes('TEXTBEFORE(A2,".")'))) pass = true;
+      if (q1Type === 'lastname' && (cVal.includes('MID(A2,FIND(".",A2)+1,FIND("@",A2)-FIND(".",A2)-1)') || cVal.includes('TEXTBETWEEN(A2,".","@")'))) pass = true;
+      if (q1Type === 'provider' && (cVal.includes('MID(A2,FIND("@",A2)+1,LEN(A2))') || cVal.includes('TEXTAFTER(A2,"@")'))) pass = true;
+      
+      feedbackText = pass ? '🎉 ถูกต้อง! ดึงข้อความได้ตรงตามเงื่อนไขเป๊ะ' : '❌ ยังไม่ถูกต้อง ลองเช็คตัวคั่น หรือวงเล็บของ FIND/MID/LEFT ดูใหม่อีกครั้งนะครับ';
+    } 
+    else if (q === 2) {
+      // ตรวจสอบโครงสร้าง IF ซ้อน และการคูณเซลล์ E2, E3, E4
+      if ((cVal.includes('B6<=5') || cVal.includes('5>=B6')) && cVal.includes('E$2') && cVal.includes('E$3') && cVal.includes('E$4')) {
+        pass = true;
+      }
+      feedbackText = pass ? '🎉 ยอดเยี่ยมมาก! ตรรกะเงื่อนไขวันลาและการล็อกตำแหน่งเซลล์ถูกต้องสมบูรณ์' : '❌ ยังไม่ถูกครับ อย่าลืมโครงสร้าง =IF($B6<=5,$D6*$E$2,IF($B6<=10,$D6*$E$3,$D6*$E$4)) และใส่ $ ล็อกเซลล์ E';
+    } 
+    else if (q === 3) {
+      if (currentQ3.mode === 'GRADE') {
+        if (cVal.includes('A8>=70') && cVal.includes('"A"') && cVal.includes('"B"') && cVal.includes('"C"') && cVal.includes('"D"') && cVal.includes('"F"')) pass = true;
+      } else {
+        if ((cVal.includes('OR(B8="D",B8="F")') || cVal.includes('OR(B8="F",B8="D")') || cVal.includes('A8<51')) && cVal.includes('"REGRADE"') && cVal.includes('""')) pass = true;
+      }
+      feedbackText = pass ? '🎉 ถูกต้องแม่นยำ! ตรรกะเงื่อนไขทำงานได้อย่างถูกต้อง' : '❌ ยังมีจุดผิดพลาด ลองตรวจดูเงื่อนไข >= หรือชื่อเกรดในฟังก์ชัน OR ดูครับ';
+    }
+
+    res.style.display = 'block';
+    res.className = `feedback ${pass ? 'correct' : 'wrong'}`;
+    res.innerHTML = feedbackText;
+  }
+
+  function showHint(q) {
+    const res = document.getElementById(`res-${q}`);
+    res.style.display = 'block';
+    res.className = 'feedback hint';
+
+    if (q === 1) {
+      if (q1Type === 'name') res.innerHTML = '💡 <strong>เฉลย Name:</strong> <code>=LEFT(A2, FIND(".", A2) - 1)</code>';
+      else if (q1Type === 'lastname') res.innerHTML = '💡 <strong>เฉลย Lastname:</strong> <code>=MID(A2, FIND(".", A2)+1, FIND("@", A2)-FIND(".", A2)-1)</code>';
+      else res.innerHTML = '💡 <strong>เฉลย Provider:</strong> <code>=MID(A2, FIND("@", A2)+1, LEN(A2))</code>';
+    } else if (q === 2) {
+      res.innerHTML = '💡 <strong>เฉลย Bonus:</strong> <code>=IF($B6<=5, $D6*$E$2, IF($B6<=10, $D6*$E$3,$D6*$E$4))</code>';
+    } else if (q === 3) {
+      if (currentQ3.mode === 'GRADE') {
+        res.innerHTML = '💡 <strong>เฉลย Grade:</strong> <code>=IF(A8>=70, "A", IF(A8>=61, "B", IF(A8>=51, "C", IF(A8>=41, "D", "F"))))</code>';
+      } else {
+        res.innerHTML = '💡 <strong>เฉลย Remark:</strong> <code>=IF(OR(B8="D", B8="F"), "Regrade", "")</code>';
+      }
+    }
+  }
+
+  // Start init
+  initTab1();
+  initTab2();
+  initTab3();
 </script>
 
 </body>
